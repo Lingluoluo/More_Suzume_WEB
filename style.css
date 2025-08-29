@@ -89,3 +89,113 @@ canvas {
   font-size: 0.95rem;
   color: #555;
 }
+/* 页面整体布局 */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+/* 页面顶部 */
+header {
+  background-color: #4CAF50;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 36px;
+}
+
+header p {
+  font-size: 18px;
+  margin-top: 10px;
+}
+
+/* 开始按钮样式 */
+#start-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+#start-button {
+  background-color: #4CAF50;
+  color: white;
+  font-size: 18px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#start-button:hover {
+  background-color: #45a049;
+}
+
+/* 进度条容器 */
+#progress-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 20px auto;
+  text-align: center;
+  display: none; /* Initially hidden */
+}
+
+progress {
+  width: 100%;
+  height: 30px;
+  margin: 10px 0;
+}
+
+#status-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 页面主体内容 */
+main {
+  padding: 20px;
+  background-color: #ffffff;
+  margin: 20px auto;
+  max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+main h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+main p {
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* 页面底部 */
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  /* position: absolute; */
+  bottom: 0;
+  width: 100%;
+}
+
+footer p {
+  margin: 5px 0;
+}
+
+footer a {
+  color: #4CAF50;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}

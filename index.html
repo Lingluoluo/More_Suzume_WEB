@@ -1,38 +1,55 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>在线拼贴生成器</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>来点绿猫</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <!-- 页面顶部的大标题 -->
+  <header>
+    <h1>More Suzume - 来点绿猫</h1>
+    <p>QwQ</p>
+  </header>
+
   <main class="container">
     <!-- 左边控制面板 -->
     <aside class="controls card">
-      <h2>参数设置</h2>
-      
-      <!-- 复选框控制图片来源 -->
-      <label><input type="checkbox" id="useUploadImages"> 使用自定义上传图片</label>
-      <div id="fileInputWrapper" style="display: none;">
-        <label>选择图片文件 <input type="file" id="fileInput" multiple accept="image/*"></label>
+      <h2>Step1. 获取绿猫</h2>
+      <p>点击按钮开始从GitHub下载图片(约550张)，请确保您的网络环境正常以及流量充足。</p>
+      <!-- 开始按钮 -->
+      <div id="start-container">
+        <button id="start-button">开始下载图片</button>
       </div>
-      
-      <label>画布宽度 <input type="number" id="canvasWidth" value="4000"></label>
-      <label>画布高度 <input type="number" id="canvasHeight" value="2500"></label>
-      <label>图片数量 <input type="number" id="imageCount" value="700"></label>
-      <label>最小尺寸 <input type="number" id="minSize" value="250"></label>
-      <label>最大尺寸 <input type="number" id="maxSize" value="400"></label>
-      <label>最大重叠 IoU <input type="number" id="maxIou" step="0.1" value="0.4"></label>
-      <label>最大尝试次数 <input type="number" id="maxAttempts" value="150"></label>
-      <label>旋转范围 (min) <input type="number" id="rotationMin" value="-30"></label>
-      <label>旋转范围 (max) <input type="number" id="rotationMax" value="30"></label>
-      <label>锚点密度 <input type="number" id="anchorDensity" step="0.001" value="0.009"></label>
-      <label>头部比例 <input type="number" id="headRatio" step="0.01" value="0.45"></label>
-      <label><input type="checkbox" id="visualizeAnchors"> 可视化锚点</label>
-      <label><input type="checkbox" id="nonTransparentPngBottom" checked> 无透明PNG放到底层</label>
-      <button id="generateBtn">生成拼贴</button>
-      <button id="saveBtn" disabled>保存为 PNG</button>
+      <div id="progress-container" style="display: none;">
+        <label for="progress-bar">加载进度:</label>
+        <progress id="progress-bar" value="0" max="100"></progress>
+        <div id="status-text">正在获取图片目录...</div>
+      </div>
+      <section>
+        <h2>Step2. 设置</h2>
+        <!-- <label><input type="checkbox" id="useUploadImages"> 使用自定义上传图片</label> -->
+        <!-- <div id="fileInputWrapper" style="display: none;"> -->
+          <!-- <label>选择图片文件 <input type="file" id="fileInput" multiple accept="image/*"></label> -->
+        <!-- </div> -->
+        <label>画布宽度 <input type="number" id="canvasWidth" value="4000"></label>
+        <label>画布高度 <input type="number" id="canvasHeight" value="2500"></label>
+        <label>使用的图片数量（不足会随机抽取重复的补齐） <input type="number" id="imageCount" value="700"></label>
+        <label>表情最小尺寸 <input type="number" id="minSize" value="250"></label>
+        <label>表情最大尺寸 <input type="number" id="maxSize" value="400"></label>
+        <label>表情之间最大重叠 IoU <input type="number" id="maxIou" step="0.1" value="0.4"></label>
+        <label>单个表情最大尝试次数 <input type="number" id="maxAttempts" value="150"></label>
+        <label>表情旋转范围 (min) <input type="number" id="rotationMin" value="-30"></label>
+        <label>表情旋转范围 (max) <input type="number" id="rotationMax" value="30"></label>
+        <label>锚点密度 <input type="number" id="anchorDensity" step="0.001" value="0.009"></label>
+        <label>头部比例 <input type="number" id="headRatio" step="0.01" value="0.45"></label>
+        <label><input type="checkbox" id="visualizeAnchors"> 可视化锚点</label>
+        <label><input type="checkbox" id="nonTransparentPngBottom" checked> 无透明PNG放到底层</label>
+        <button id="generateBtn">Step3. 来点绿猫</button>
+        <button id="saveBtn" disabled>保存为 PNG</button>
+      </section>
     </aside>
 
     <!-- 中间画布 -->
@@ -49,8 +66,25 @@
       </div>
       <p id="progressText">等待开始...</p>
     </section>
+
+    <!-- 页面主体区域 -->
+    <section>
+      <h2>如何使用</h2>
+      <p>1. 点击Step1中的按钮从Github仓库中下载图片。</p>
+      <p>2. 调整参数。</p>
+      <p>3. 整点绿猫</p>
+    </section>
   </main>
 
+  <!-- 页面底部版权信息 -->
+  <footer>
+    <p>&copy; 2025 Yuluoxk. All Rights Reserved.</p>
+    <p>Coding : Chtgpt-4 by OpenAI</p>
+    <p>Web版本 GitHub仓库地址: <a href="https://github.com/Lingluoluo/More_Suzume_WEB" target="_blank">https://github.com/Lingluoluo/More_Suzume_WEB</a></p>
+    <p>Python版本 GitHub 仓库地址: <a href="https://github.com/Lingluoluo/More_Suzume" target="_blank">https://github.com/Lingluoluo/More_Suzume</a></p>
+  </footer>
+
+  <!-- 引入 JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>

@@ -121,15 +121,6 @@ async function placeImages(canvas, baseLayer, topLayer, config) {
   document.getElementById("saveBtn").disabled = false;
 }
 
-// === 事件绑定 ===
-document.getElementById("useUploadImages").addEventListener("change", (e) => {
-  const fileInputWrapper = document.getElementById("fileInputWrapper");
-  if (e.target.checked) {
-    fileInputWrapper.style.display = 'block';  // 显示文件选择框
-  } else {
-    fileInputWrapper.style.display = 'none';   // 隐藏文件选择框
-  }
-});
 
 // 生成按钮点击事件
 document.getElementById("generateBtn").addEventListener("click", async () => {
@@ -189,33 +180,140 @@ document.getElementById("saveBtn").addEventListener("click", () => {
   link.click();
 });
 
-// 从 GitHub 仓库加载图片文件名 JSON
-async function fetchImagesFromGitHub() {
-  const baseURL = 'https://raw.githubusercontent.com/Lingluoluo/More_Suzume_WEB/main/images/';  // GitHub raw 地址
-  const jsonURL = 'https://raw.githubusercontent.com/Lingluoluo/More_Suzume_WEB/main/images.json';  // JSON 文件的 raw 地址
-  
-  // 请求 JSON 文件（图片文件名列表）
-  const response = await fetch(jsonURL);
-  const imageFiles = await response.json(); // 获取 JSON 中的文件名数组
 
-  const files = [];
-  
-  // 遍历并加载每一张图片
-  for (let file of imageFiles) {
-    const img = new Image();
-    img.src = `${baseURL}${file}`;  // 从 GitHub 仓库的 raw URL 加载图片
-    await new Promise((resolve) => {
-      img.onload = () => resolve();
-    });
-    files.push(img);
-  }
 
-  return files;
+// 更新进度条和状态文本的函数
+function updateProgressBar(percentage, message) {
+  const progressBar = document.getElementById('progress-bar');
+  const statusText = document.getElementById('status-text');
+
+  progressBar.value = percentage;
+  statusText.textContent = message;
 }
 
-// 使用上述函数加载图片
-fetchImagesFromGitHub().then((files) => {
-  console.log("图片已加载:", files);
-  // 继续处理图片生成逻辑
+// 显示按钮点击后开始下载图片
+document.getElementById('start-button').addEventListener('click', async function() {
+  // 显示进度条并开始下载
+  document.getElementById('progress-container').style.display = 'block';  // 显示进度条
+  updateProgressBar(1, "正在获取图片目录...");
+
+  const baseURL = 'https://raw.githubusercontent.com/Lingluoluo/More_Suzume_WEB/main/images/';  // GitHub raw 地址
+  const jsonURL = 'https://raw.githubusercontent.com/Lingluoluo/More_Suzume_WEB/main/images.json';  // JSON 文件的 raw 地址
+
+  try {
+    // 请求 JSON 文件（图片文件名列表）
+    const response = await fetch(jsonURL);
+    const imageFiles = await response.json(); // 获取 JSON 中的文件名数组
+
+    // 获取目录成功，进度条显示为 1%
+    updateProgressBar(1, "图片目录获取成功，正在下载图片...");
+
+    // 打开 IndexedDB 数据库
+    const db = await openIndexedDB();
+
+    const files = [];
+    let downloadedImages = 0;
+
+    // 遍历并加载每一张图片
+    for (let i = 0; i < imageFiles.length; i++) {
+      const file = imageFiles[i];
+
+      // 检查 IndexedDB 中是否已缓存该图片
+      try {
+        const cachedImage = await getImageFromIndexedDB(db, file);
+        if (cachedImage) {
+          downloadedImages++;
+          const progress = Math.floor(((downloadedImages) / imageFiles.length) * 100);
+          updateProgressBar(progress, `跳过已下载的图片: ${file}`);
+          continue;
+        }
+      } catch (e) {
+        console.log(`图片 ${file} 不在缓存中，开始下载...`);
+      }
+
+      const img = new Image();
+      img.src = `${baseURL}${file}`;  // 从 GitHub 仓库的 raw URL 加载图片
+
+      // 等待图片加载完成
+      await new Promise((resolve) => {
+        img.onload = () => resolve();
+      });
+
+      files.push(img);
+
+      // 下载成功后缓存图片
+      const blob = await fetch(img.src).then((res) => res.blob());
+      await storeImageInIndexedDB(db, file, blob);
+
+      // 每下载完一张图片，更新进度条
+      const progress = Math.floor(((downloadedImages + 1) / imageFiles.length) * 100);
+      updateProgressBar(progress, `正在下载图片: ${i + 1} / ${imageFiles.length}`);
+      downloadedImages++;
+    }
+
+    // 下载完成
+    updateProgressBar(100, "所有图片下载完成！");
+    console.log("图片已加载:", files);
+    // 继续处理图片生成逻辑
+
+  } catch (error) {
+    console.error("图片加载失败:", error);
+    updateProgressBar(0, "图片加载失败，请重试。");
+  }
 });
 
+
+// 创建和打开 IndexedDB 数据库
+function openIndexedDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('imageCacheDB', 1);
+
+    request.onerror = function (event) {
+      reject('IndexedDB 错误: ' + event.target.error);
+    };
+
+    request.onsuccess = function (event) {
+      resolve(event.target.result);
+    };
+
+    request.onupgradeneeded = function (event) {
+      const db = event.target.result;
+      const objectStore = db.createObjectStore('images', { keyPath: 'fileName' });
+      objectStore.createIndex('fileName', 'fileName', { unique: true });
+    };
+  });
+}
+
+// 从 IndexedDB 获取图片是否已缓存
+function getImageFromIndexedDB(db, fileName) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['images'], 'readonly');
+    const objectStore = transaction.objectStore('images');
+    const request = objectStore.get(fileName);
+
+    request.onsuccess = function () {
+      resolve(request.result); // 如果缓存存在，返回数据
+    };
+
+    request.onerror = function () {
+      reject('获取图片失败');
+    };
+  });
+}
+
+// 将图片存入 IndexedDB
+function storeImageInIndexedDB(db, fileName, imageBlob) {
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(['images'], 'readwrite');
+    const objectStore = transaction.objectStore('images');
+    const request = objectStore.put({ fileName, image: imageBlob });
+
+    request.onsuccess = function () {
+      resolve('图片已缓存');
+    };
+
+    request.onerror = function () {
+      reject('缓存图片失败');
+    };
+  });
+}
