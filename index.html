@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>在线拼贴生成器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <!-- 左边控制面板 -->
+    <aside class="controls card">
+      <h2>参数设置</h2>
+      
+      <!-- 复选框控制图片来源 -->
+      <label><input type="checkbox" id="useUploadImages"> 使用自定义上传图片</label>
+      <div id="fileInputWrapper" style="display: none;">
+        <label>选择图片文件 <input type="file" id="fileInput" multiple accept="image/*"></label>
+      </div>
+      
+      <label>画布宽度 <input type="number" id="canvasWidth" value="4000"></label>
+      <label>画布高度 <input type="number" id="canvasHeight" value="2500"></label>
+      <label>图片数量 <input type="number" id="imageCount" value="700"></label>
+      <label>最小尺寸 <input type="number" id="minSize" value="250"></label>
+      <label>最大尺寸 <input type="number" id="maxSize" value="400"></label>
+      <label>最大重叠 IoU <input type="number" id="maxIou" step="0.1" value="0.4"></label>
+      <label>最大尝试次数 <input type="number" id="maxAttempts" value="150"></label>
+      <label>旋转范围 (min) <input type="number" id="rotationMin" value="-30"></label>
+      <label>旋转范围 (max) <input type="number" id="rotationMax" value="30"></label>
+      <label>锚点密度 <input type="number" id="anchorDensity" step="0.001" value="0.009"></label>
+      <label>头部比例 <input type="number" id="headRatio" step="0.01" value="0.45"></label>
+      <label><input type="checkbox" id="visualizeAnchors"> 可视化锚点</label>
+      <label><input type="checkbox" id="nonTransparentPngBottom" checked> 无透明PNG放到底层</label>
+      <button id="generateBtn">生成拼贴</button>
+      <button id="saveBtn" disabled>保存为 PNG</button>
+    </aside>
+
+    <!-- 中间画布 -->
+    <section class="canvas-container card">
+      <h2>结果</h2>
+      <canvas id="canvas"></canvas>
+    </section>
+
+    <!-- 下方进度条 -->
+    <section class="progress-container card">
+      <h2>生成进度</h2>
+      <div id="progressBarWrapper">
+        <div id="progressBar"></div>
+      </div>
+      <p id="progressText">等待开始...</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
